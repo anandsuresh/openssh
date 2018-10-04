@@ -93,17 +93,31 @@ default['openssh']['client']['use_roaming'] = 'no' unless node['platform_family'
 # default['openssh']['server']['host_key_rsa'] = '/etc/ssh/ssh_host_rsa_key'
 # default['openssh']['server']['host_key_dsa'] = '/etc/ssh/ssh_host_dsa_key'
 
-if (platform_family?('rhel') && node['platform_version'].to_i == 6) || platform_family?('smartos')
-  default['openssh']['server']['host_key'] = ['/etc/ssh/ssh_host_rsa_key', '/etc/ssh/ssh_host_dsa_key']
-end
-
-if (platform_family?('rhel') && node['platform_version'].to_i >= 7) || platform?('amazon', 'fedora') || platform_family?('debian')
+if platform_family?('rhel') && node['platform_version'].to_i == 6
+  default['openssh']['server']['host_key'] = [
+    '/etc/ssh/ssh_host_rsa_key',
+    '/etc/ssh/ssh_host_dsa_key'
+  ]
+elsif (platform_family?('rhel') && node['platform_version'].to_i >= 7) || platform?('amazon', 'fedora') || platform_family?('debian')
   # EL7 does not generate a DSA key by default like EL6 used to, yet
   # the upstream OpenSSH code wants to find one, so continually spits
   # out a harmless error line to syslog. So we explicitly indicate the
   # HostKey files that are auto-generated on an EL7 host
-  default['openssh']['server']['host_key'] = ['/etc/ssh/ssh_host_rsa_key', '/etc/ssh/ssh_host_ecdsa_key', '/etc/ssh/ssh_host_ed25519_key']
+  default['openssh']['server']['host_key'] = [
+    '/etc/ssh/ssh_host_rsa_key',
+    '/etc/ssh/ssh_host_ecdsa_key',
+    '/etc/ssh/ssh_host_ed25519_key'
+  ]
+elsif platform_family?('smartos')
+  # /etc is not persisted across reboots on SmartOS. Hence the keys reside in /var
+  default['openssh']['server']['host_key'] = [
+    '/var/ssh/ssh_host_dsa_key',
+    '/var/ssh/ssh_host_ecdsa_key',
+    '/var/ssh/ssh_host_ed25519_key',
+    '/var/ssh/ssh_host_rsa_key'
+  ]
 end
+
 # default['openssh']['server']['host_key_ecdsa'] = '/etc/ssh/ssh_host_ecdsa_key'
 # default['openssh']['server']['key_regeneration_interval'] = '1h'
 # default['openssh']['server']['server_key_bits'] = '1024'

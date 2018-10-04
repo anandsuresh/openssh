@@ -15,6 +15,7 @@ Installs and configures OpenSSH client and daemon.
 - Suse Enterprise Linux
 - openSUSE / openSUSE leap
 - AIX 7.1
+- SmartOS
 
 ### Chef
 

@@ -86,8 +86,9 @@ template '/etc/ssh/sshd_config' do
   notifies :restart, 'service[ssh]'
 end
 
+sshd = platform_family?('smartos') ? '/usr/lib/ssh/sshd' : '/usr/sbin/sshd'
 execute 'sshd-config-check' do
-  command '/usr/sbin/sshd -t'
+  command "#{sshd} -t"
   action :nothing
 end
 
